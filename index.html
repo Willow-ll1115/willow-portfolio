@@ -1480,9 +1480,9 @@
                             <div class="media-container" data-index="${idx}">
                                 <div class="media-label"><span class="badge ${badgeClass}">${badgeText}</span> ${media.title}</div>
                                 <div class="video-wrapper">
-                                    <video controls preload="metadata" data-index="${idx}">
-                                        <source src="${media.src}" type="video/mp4">
-                                        您的浏览器不支持视频播放。
+                                    <video controls preload="none" data-index="${idx}">
+    <source data-src="${media.src}" type="video/mp4">
+    您的浏览器不支持视频播放。
                                     </video>
                                 </div>
                             </div>
@@ -1524,9 +1524,9 @@
                     <div class="media-container" data-index="0">
                         <div class="media-label"><span class="badge video-badge">视频</span> 正片</div>
                         <div class="video-wrapper">
-                            <video controls preload="metadata" data-index="0">
-                                <source src="${project.video}" type="video/mp4">
-                                您的浏览器不支持视频播放。
+                            <video controls preload="none" data-index="0">
+    <source data-src="${project.video}" type="video/mp4">
+    您的浏览器不支持视频播放。
                             </video>
                         </div>
                     </div>
@@ -1640,6 +1640,7 @@
 
             // ---- 显示模态框 ----
             overlay.classList.add('active');
+            if (window.initLazyVideos) window.initLazyVideos();
             box.classList.add('active');
             document.body.style.overflow = 'hidden';
 
@@ -1725,5 +1726,54 @@
         renderProjects();
         console.log('✅ 已加载所有项目（纪录片、小红书、游戏剧情策划为三大卡片）');
     </script>
+
+<script>
+(function () {
+    function loadVideo(video) {
+        if (!video || video.dataset.loaded === "true") return;
+
+        var sources = video.querySelectorAll("source[data-src]");
+        sources.forEach(function (source) {
+            source.src = source.dataset.src;
+            source.removeAttribute("data-src");
+        });
+
+        video.dataset.loaded = "true";
+        video.load();
+    }
+
+    function initLazyVideos() {
+        var videos = document.querySelectorAll("video");
+        if (!videos.length) return;
+
+        if (!("IntersectionObserver" in window)) {
+            videos.forEach(loadVideo);
+            return;
+        }
+
+        var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    loadVideo(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            rootMargin: "800px 0px"
+        });
+
+        videos.forEach(function (video) {
+            observer.observe(video);
+            video.addEventListener("play", function () {
+                loadVideo(video);
+            }, { once: true });
+        });
+    }
+
+    // 兼容你的网站：视频是在打开项目弹窗后动态生成的。
+    window.initLazyVideos = initLazyVideos;
+})();
+</script>
+
 </body>
 </html>
