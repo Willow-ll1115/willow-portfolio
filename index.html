@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <title>Willow · 刘恋 · Zine Portfolio</title>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Noto+Serif+SC:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <style>
@@ -1136,7 +1138,7 @@
 
         <!-- ===== HERO ===== -->
         <section class="hero" id="hero">
-            <img loading="lazy" src="images/勿忘我.png" alt="勿忘我" class="hero-symbol-forgetme" />
+            <img src="images/勿忘我.png" alt="勿忘我" class="hero-symbol-forgetme" fetchpriority="high" decoding="async" />
             <div class="hero-content">
                 <h1>
                     <span class="en">
@@ -1494,7 +1496,7 @@
                             <div class="media-container" data-index="${idx}">
                                 <div class="media-label"><span class="badge ${badgeClass}">${badgeText}</span> ${media.title}</div>
                                 <div class="audio-wrapper">
-                                    <audio controls preload="metadata" data-index="${idx}">
+                                    <audio controls preload="none" data-index="${idx}">
                                         <source src="${media.src}" type="audio/mpeg">
                                         您的浏览器不支持音频播放。
                                     </audio>
@@ -1672,8 +1674,11 @@
             const box = document.getElementById('modalBox');
             if (!overlay || !box) return;
             const medias = box.querySelectorAll('video, audio');
-            medias.forEach(m => { m.pause();
-                m.currentTime = 0; });
+            medias.forEach(m => {
+                m.pause();
+                m.currentTime = 0;
+                // 保留 src，让浏览器下次打开时可以复用缓存。
+            });
             activeMedia = null;
             document.querySelectorAll('.media-container').forEach(c => c.classList.remove('media-active'));
             overlay.classList.remove('active');
@@ -1729,6 +1734,10 @@
 
 <script>
 (function () {
+    // 首页不加载视频；打开项目后，第一条视频优先后台加载。
+    // 其余视频接近视口时再加载；用户点击播放时立即加载。
+    var observer = null;
+
     function loadVideo(video) {
         if (!video || video.dataset.loaded === "true") return;
 
@@ -1743,34 +1752,47 @@
     }
 
     function initLazyVideos() {
-        var videos = document.querySelectorAll("video");
+        var videos = document.querySelectorAll("#modalContent video");
         if (!videos.length) return;
 
-        if (!("IntersectionObserver" in window)) {
-            videos.forEach(loadVideo);
-            return;
-        }
+        // 用户刚打开项目，马上让第一条视频进入后台加载。
+        setTimeout(function () {
+            loadVideo(videos[0]);
+        }, 120);
 
-        var observer = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting) {
-                    loadVideo(entry.target);
-                    observer.unobserve(entry.target);
+        if ("IntersectionObserver" in window) {
+            if (observer) observer.disconnect();
+
+            observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        loadVideo(entry.target);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                rootMargin: "700px 0px",
+                threshold: 0
+            });
+
+            videos.forEach(function (video, index) {
+                if (index > 0) observer.observe(video);
+
+                video.addEventListener("play", function () {
+                    loadVideo(video);
+                }, { once: true });
+            });
+        } else {
+            videos.forEach(function (video, index) {
+                if (index > 0) {
+                    video.addEventListener("play", function () {
+                        loadVideo(video);
+                    }, { once: true });
                 }
             });
-        }, {
-            rootMargin: "800px 0px"
-        });
-
-        videos.forEach(function (video) {
-            observer.observe(video);
-            video.addEventListener("play", function () {
-                loadVideo(video);
-            }, { once: true });
-        });
+        }
     }
 
-    // 兼容你的网站：视频是在打开项目弹窗后动态生成的。
     window.initLazyVideos = initLazyVideos;
 })();
 </script>
