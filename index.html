@@ -27,46 +27,14 @@
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             background-image:
-                radial-gradient(circle at 10% 20%, rgba(140, 120, 90, 0.25) 1.5px, transparent 1.5px),
-                radial-gradient(circle at 30% 60%, rgba(160, 140, 110, 0.2) 1.5px, transparent 1.5px),
-                radial-gradient(circle at 60% 30%, rgba(130, 110, 80, 0.18) 1.5px, transparent 1.5px),
-                radial-gradient(circle at 80% 70%, rgba(150, 130, 100, 0.22) 1.5px, transparent 1.5px),
-                radial-gradient(circle at 45% 85%, rgba(145, 125, 95, 0.2) 1.5px, transparent 1.5px),
-                radial-gradient(circle at 15% 45%, rgba(120, 100, 70, 0.15) 1px, transparent 1px),
-                radial-gradient(circle at 70% 55%, rgba(135, 115, 85, 0.12) 1px, transparent 1px),
-                radial-gradient(circle at 40% 15%, rgba(155, 135, 105, 0.14) 1px, transparent 1px),
-                radial-gradient(circle at 90% 40%, rgba(125, 105, 75, 0.16) 1px, transparent 1px),
-                radial-gradient(circle at 55% 70%, rgba(140, 120, 90, 0.13) 1px, transparent 1px),
-                repeating-linear-gradient(45deg, rgba(180, 160, 130, 0.08) 0px, rgba(180, 160, 130, 0.08) 1px, transparent 1px, transparent 4px),
-                repeating-linear-gradient(-45deg, rgba(160, 140, 110, 0.07) 0px, rgba(160, 140, 110, 0.07) 1px, transparent 1px, transparent 5px),
-                repeating-linear-gradient(80deg, rgba(170, 150, 120, 0.05) 0px, rgba(170, 150, 120, 0.05) 1px, transparent 1px, transparent 8px),
-                repeating-linear-gradient(-70deg, rgba(150, 130, 100, 0.06) 0px, rgba(150, 130, 100, 0.06) 1px, transparent 1px, transparent 7px),
-                repeating-linear-gradient(0deg, rgba(120, 105, 80, 0.04) 0px, rgba(120, 105, 80, 0.04) 2px, transparent 2px, transparent 12px),
-                radial-gradient(circle at 20% 30%, rgba(160, 140, 110, 0.10) 0.8px, transparent 0.8px),
-                radial-gradient(circle at 80% 70%, rgba(180, 160, 130, 0.08) 0.8px, transparent 0.8px);
-            background-size:
-                60px 60px, 80px 80px, 100px 100px, 90px 90px, 70px 70px,
-                40px 40px, 50px 50px, 45px 45px, 55px 55px, 65px 65px,
-                8px 8px, 10px 10px, 16px 16px, 14px 14px,
-                20px 20px,
-                40px 40px, 60px 60px;
-            background-attachment: fixed;
+                radial-gradient(circle at 20% 30%, rgba(140, 120, 90, 0.10) 1px, transparent 1px),
+                repeating-linear-gradient(45deg, rgba(180, 160, 130, 0.045) 0, rgba(180, 160, 130, 0.045) 1px, transparent 1px, transparent 5px);
+            background-size: 70px 70px, 10px 10px;
             position: relative;
         }
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 0.15;
-            background-image:
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E"),
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n2)' opacity='0.3'/%3E%3C/svg%3E");
-            background-repeat: repeat, repeat;
-            background-size: 256px 256px, 150px 150px;
-            mix-blend-mode: multiply;
-        }
+        /* 性能优化：移除固定 SVG 噪点层，避免持续 GPU/重绘开销 */
+        body::after { display: none; }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -403,7 +371,7 @@
             border: 1px solid var(--border-ink);
             border-radius: 4px;
             overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.4s ease;
+            transition: transform 0.2s ease;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
             cursor: pointer;
             position: relative;
@@ -412,7 +380,7 @@
         }
         .project-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 12px 30px rgba(26, 26, 26, 0.08);
+            box-shadow: 0 6px 16px rgba(26, 26, 26, 0.06);
         }
 
         /* 大卡片样式 */
@@ -479,7 +447,6 @@
             top: 12px;
             right: 12px;
             background: rgba(239, 228, 212, 0.85);
-            backdrop-filter: blur(4px);
             padding: 4px 14px;
             font-size: 0.7rem;
             letter-spacing: 0.06em;
@@ -560,7 +527,6 @@
             position: fixed;
             inset: 0;
             background: rgba(26, 26, 26, 0.5);
-            backdrop-filter: blur(4px);
             z-index: 200;
             opacity: 0;
             pointer-events: none;
@@ -842,7 +808,6 @@
             padding: 20px 24px;
             border: 1px solid var(--border-ink);
             border-radius: 4px;
-            backdrop-filter: blur(2px);
         }
         .skill-category h3 {
             font-family: 'Noto Serif SC', serif;
@@ -1103,6 +1068,14 @@
             }
             .project-card.small-card .card-title {
                 font-size: 1rem;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
             }
         }
     </style>
@@ -1406,7 +1379,7 @@
             featuredGrid.innerHTML = featured.map((p) => {
                 const statusBadge = p.status === 'Coming Soon' ? `<span class="status-badge">即将推出</span>` :
                     (p.status === 'Completed' ? `<span class="status-badge">✅ 已完成</span>` : '');
-                const coverHtml = p.cover ? `<img loading="lazy" src="${p.cover}" alt="${p.title}" />` :
+                const coverHtml = p.cover ? `<img loading="lazy" decoding="async" src="${p.cover}" alt="${p.title}" />` :
                     `<span class="placeholder">${p.title.charAt(0)}</span>`;
                 return `
                     <div class="project-card featured-card" data-slug="${p.slug}">
@@ -1425,7 +1398,7 @@
             normalGrid.innerHTML = normal.map((p) => {
                 const statusBadge = p.status === 'Coming Soon' ? `<span class="status-badge">即将推出</span>` :
                     (p.status === 'Completed' ? `<span class="status-badge">✅ 已完成</span>` : '');
-                const coverHtml = p.cover ? `<img loading="lazy" src="${p.cover}" alt="${p.title}" />` :
+                const coverHtml = p.cover ? `<img loading="lazy" decoding="async" src="${p.cover}" alt="${p.title}" />` :
                     `<span class="placeholder">${p.title.charAt(0)}</span>`;
                 return `
                     <div class="project-card small-card" data-slug="${p.slug}">
@@ -1510,7 +1483,7 @@
                             <div class="media-container" data-index="${idx}">
                                 <div class="media-label"><span class="badge ${badgeClass}">${badgeText}</span> ${media.title}</div>
                                 <div class="link-card-content">
-                                    ${media.src ? `<img loading="lazy" src="${media.src}" alt="文章配图" />` : ''}
+                                    ${media.src ? `<img loading="lazy" decoding="async" src="${media.src}" alt="文章配图" />` : ''}
                                     <div class="link-text">
                                         <div class="link-title">${media.title}</div>
                                         <a href="${media.url}" target="_blank" rel="noopener noreferrer" class="link-btn">🔗 查看原文</a>
@@ -1594,7 +1567,7 @@
                 scriptImageHtml = `
                     <div class="script-image-wrapper">
                         <div class="script-title">📄 项目展示图</div>
-                        <img loading="lazy" src="${project.scriptImage}" alt="项目展示图" />
+                        <img loading="lazy" decoding="async" src="${project.scriptImage}" alt="项目展示图" />
                     </div>
                 `;
             }
@@ -1698,10 +1671,16 @@
         // 导航滚动、移动端菜单
         // ================================================================
         const navbar = document.getElementById('navbar');
+        let scrollTicking = false;
         window.addEventListener('scroll', function() {
-            if (window.scrollY > 20) navbar.classList.add('scrolled');
-            else navbar.classList.remove('scrolled');
-        });
+            if (scrollTicking) return;
+            scrollTicking = true;
+            requestAnimationFrame(function() {
+                if (window.scrollY > 20) navbar.classList.add('scrolled');
+                else navbar.classList.remove('scrolled');
+                scrollTicking = false;
+            });
+        }, { passive: true });
 
         const hamburger = document.getElementById('hamburger');
         const mobileMenu = document.getElementById('mobileMenu');
